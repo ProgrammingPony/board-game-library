@@ -1,0 +1,10 @@
+UnityBuild/
+
+# Claude (local, per-developer — never commit)
+.claude/settings.local.json
+.claude/skills/
+.mcp.json
+
+# IDE workspace folders (per-developer)
+.vscode/
+.idea/
