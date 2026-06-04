@@ -4,6 +4,7 @@
     "references": [
         "Checkers",
         "CheckersCore",
+        "MainMenu",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
