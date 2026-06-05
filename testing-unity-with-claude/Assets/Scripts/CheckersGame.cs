@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Checkers controller. Owns the board state and turn flow, and wires together the
@@ -224,5 +225,9 @@ public class CheckersGame : MonoBehaviour
 
         if (GUI.Button(new Rect(16, 74, 120, 30), "New Game"))
             NewGame();
+
+        // Always-visible return to the game library, directly below New Game.
+        if (GUI.Button(new Rect(16, 110, 120, 30), "Main Menu"))
+            SceneManager.LoadScene("MainMenu");
     }
 }
