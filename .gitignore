@@ -1,4 +1,4 @@
-UnityBuild/
+Build/
 
 # Claude (local, per-developer — never commit)
 .claude/settings.local.json
