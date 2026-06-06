@@ -41,6 +41,7 @@ public class MainMenuController : MonoBehaviour
     const float TitleGap = 16f; // gap between subtitle and first button
     const float ButtonH = 52f;
     const float ButtonGap = 12f;
+    const float QuitGap = 18f;  // extra space separating the games from "Return to Desktop"
     const float BottomPad = 22f;
 
     // ---- Generated art (built once, reused every frame) ----
@@ -48,6 +49,9 @@ public class MainMenuController : MonoBehaviour
     Texture2D _btnNormal;  // button backgrounds
     Texture2D _btnHover;
     Texture2D _btnActive;
+    Texture2D _quitNormal; // "Return to Desktop" button — subdued, secondary look
+    Texture2D _quitHover;
+    Texture2D _quitActive;
     float _cardH;          // total card height, derived from the game count
 
     /// <summary>
@@ -57,6 +61,32 @@ public class MainMenuController : MonoBehaviour
     /// </summary>
     public void Launch(string sceneName) => SceneManager.LoadScene(sceneName);
 
+    /// <summary>
+    /// Overridable quit action. Defaults to the real platform quit (see
+    /// <see cref="DefaultQuit"/>); a PlayMode test swaps it so it can verify the
+    /// "Return to Desktop" button's wiring without actually terminating the editor
+    /// (and the test run) along with it.
+    /// </summary>
+    public System.Action QuitAction;
+
+    /// <summary>
+    /// Exit the application, returning the player to the desktop. Exposed separately
+    /// (like <see cref="Launch"/>) so it can be driven directly from a test without an
+    /// IMGUI click.
+    /// </summary>
+    public void Quit() => (QuitAction ?? DefaultQuit)();
+
+    // The real quit. In the editor, Application.Quit is a no-op, so stop play mode
+    // instead to give the same "back to where you were" behaviour.
+    static void DefaultQuit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     void OnDisable()
     {
         // Generated textures aren't garbage-collected; release them explicitly.
@@ -64,6 +94,9 @@ public class MainMenuController : MonoBehaviour
         Destroy(_btnNormal);
         Destroy(_btnHover);
         Destroy(_btnActive);
+        Destroy(_quitNormal);
+        Destroy(_quitHover);
+        Destroy(_quitActive);
         _card = null;
     }
 
@@ -122,6 +155,18 @@ public class MainMenuController : MonoBehaviour
                 Launch(game.sceneName);
             by += ButtonH + ButtonGap;
         }
+
+        // "Return to Desktop" sits apart from the games, styled as a subdued, secondary
+        // exit action so it doesn't compete with the game buttons.
+        var quit = new GUIStyle(button)
+        {
+            normal = { background = _quitNormal, textColor = new Color(0.82f, 0.84f, 0.90f) },
+            hover = { background = _quitHover, textColor = Color.white },
+            active = { background = _quitActive, textColor = new Color(0.82f, 0.84f, 0.90f) }
+        };
+        by += QuitGap - ButtonGap;
+        if (GUI.Button(new Rect(innerX, by, innerW, ButtonH), "Return to Desktop", quit))
+            Quit();
     }
 
     // ---------------------------------------------------------------------------
@@ -134,6 +179,7 @@ public class MainMenuController : MonoBehaviour
 
         float bodyH = TopPad + TitleH + SubH + TitleGap
                       + Games.Length * ButtonH + (Games.Length - 1) * ButtonGap
+                      + QuitGap + ButtonH   // the "Return to Desktop" button
                       + BottomPad;
         _cardH = HeaderH + bodyH;
 
@@ -141,6 +187,9 @@ public class MainMenuController : MonoBehaviour
         _btnNormal = Solid(new Color(0.92f, 0.94f, 0.98f));
         _btnHover = Solid(new Color(1f, 1f, 1f));
         _btnActive = Solid(new Color(0.80f, 0.84f, 0.92f));
+        _quitNormal = Solid(new Color(0.22f, 0.24f, 0.30f));
+        _quitHover = Solid(new Color(0.30f, 0.32f, 0.40f));
+        _quitActive = Solid(new Color(0.17f, 0.18f, 0.23f));
     }
 
     static Texture2D Solid(Color c)

@@ -63,4 +63,30 @@ public class MainMenuNavigationTests
                 if (game.CellValue(c, r) > 0) red++;
         Assert.AreEqual(12, red, "A fresh Checkers board has 12 human (Red) pieces.");
     }
+
+    [UnityTest]
+    public IEnumerator ReturnToDesktop_TriggersTheQuitAction()
+    {
+        Assert.AreEqual("MainMenu", SceneManager.GetActiveScene().name, "The menu scene should be loaded.");
+
+        var menu = Object.FindAnyObjectByType<MainMenuController>();
+        Assert.IsNotNull(menu, "The MainMenu scene should contain a MainMenuController.");
+
+        // Substitute the quit action so the test verifies the button's wiring without
+        // the real quit firing — in the editor that stops play mode, which would tear
+        // down the test run itself. This mirrors how the other test drives Launch()
+        // directly rather than simulating an IMGUI click.
+        bool quit = false;
+        menu.QuitAction = () => quit = true;
+
+        // Trigger exactly what the "Return to Desktop" button does.
+        menu.Quit();
+
+        Assert.IsTrue(quit, "The 'Return to Desktop' button should invoke the quit action.");
+
+        // Still on the menu — quitting is the only side effect, no scene navigation.
+        Assert.AreEqual("MainMenu", SceneManager.GetActiveScene().name,
+            "Returning to desktop should not navigate to another scene.");
+        yield break;
+    }
 }
