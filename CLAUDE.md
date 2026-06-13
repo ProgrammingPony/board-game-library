@@ -58,7 +58,13 @@ the menu button) and screenshot again.
 ## Conventions / gotchas
 
 - Shell is **PowerShell** on Windows; the Bash tool is also available.
-- The Unity display name (`productName` / `metroPackageName` in `ProjectSettings.asset`) is
-  still the legacy `testing-unity-with-claude` and is independent of the folder name — leave
-  it unless asked to rebrand.
+- `productName` / `metroPackageName` in `ProjectSettings.asset` are `BoardGameLibrary`,
+  matching the project folder.
+- If a project-setting change doesn't show up in a build, suspect cached editor state rather
+  than the setting itself: (1) the open editor holds settings in memory and can overwrite
+  external file edits on its next save, so change settings via the editor UI or with it closed;
+  (2) some build outputs come from cached state, not the obvious field — e.g. the standalone
+  `.exe` name is the filename in the build-location path saved in `EditorUserBuildSettings`
+  (reused by "Build And Run"), not `productName`. Inspect/repair live editor state with the
+  Unity MCP (`script-execute`) rather than guessing from files on disk.
 - Don't commit `Library/` or `Build/` (already git-ignored).
