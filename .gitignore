@@ -5,6 +5,9 @@ Build/
 .claude/skills/
 .mcp.json
 
+# OpenCode (plugin-generated, per-developer — never commit)
+**/.opencode/skills/
+
 # IDE workspace folders (per-developer)
 .vscode/
 .idea/
